@@ -1,19 +1,20 @@
 package machine
 
 fun main() {
-
     val coffeeMachine = mutableListOf(400, 540, 120, 9, 550)
 
-    printMachineCoffee(coffeeMachine)
-
-    print("Write action (buy, fill, take): ")
-    when (readln()) {
-        "buy" -> coffeeBuyCups(coffeeMachine)
-        "fill" -> fillCoffeeMachine(coffeeMachine)
-        "take" -> takeCoffeeMachine(coffeeMachine)
+    while (true) {
+        print("Write action (buy, fill, take, remaining, exit): ")
+        when (readln()) {
+            "buy" -> coffeeBuyCups(coffeeMachine)
+            "fill" -> fillCoffeeMachine(coffeeMachine)
+            "take" -> takeCoffeeMachine(coffeeMachine)
+            "remaining" -> printMachineCoffee(coffeeMachine)
+            "exit" -> break
+        }
     }
 
-    printMachineCoffee(coffeeMachine)
+
 }
 
 fun takeCoffeeMachine(coffeeMachine: MutableList<Int>): MutableList<Int> {
@@ -59,12 +60,12 @@ fun coffeeBuyCups(coffeeMachine: MutableList<Int>): MutableList<Int> {
     val latte = mapOf("water" to 350, "milk" to 75, "gramsCoffee" to 20, "cost" to 7)
     val espresso = mapOf("water" to 250, "gramsCoffee" to 16, "cost" to 4)
 
-    println("What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino: > 3")
+    print("What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino, back - to main menu: ")
 
-    return when (readln().toInt()) {
-        3 -> cupsServing(coffeeMachine, cappuccino)
-        2 -> cupsServing(coffeeMachine, latte)
-        1 -> cupsServing(coffeeMachine, espresso)
+    return when (readln()) {
+        "3" -> cupsServing(coffeeMachine, cappuccino)
+        "2" -> cupsServing(coffeeMachine, latte)
+        "1" -> cupsServing(coffeeMachine, espresso)
         else -> coffeeMachine
     }
 
@@ -74,11 +75,33 @@ private fun cupsServing(
     coffeeMachine: MutableList<Int>,
     coffee: Map<String, Int>,
 ): MutableList<Int> {
-    coffeeMachine[0] = coffeeMachine[0] - coffee["water"]!!
-    coffeeMachine[1] = if (coffee["milk"] != null) coffeeMachine[1] - coffee["milk"]!! else coffeeMachine[1]
-    coffeeMachine[2] = coffeeMachine[2] - coffee["gramsCoffee"]!!
-    coffeeMachine[3] = coffeeMachine[3] - 1
-    coffeeMachine[4] = coffeeMachine[4] + coffee["cost"]!!
+
+    if (coffeeMachine[0] < coffee["water"]!!) {
+        println("Sorry, not enough water!")
+    } else if (coffee["milk"] != null && coffeeMachine[1] < coffee["milk"]!!) {
+        println("Sorry, not enough milk!")
+    } else if (coffeeMachine[2] < coffee["gramsCoffee"]!!) {
+        println("Sorry, not enough grams coffee!")
+    } else if (coffeeMachine[3] <= 0) {
+        println("Sorry, not enough cups!")
+    } else if (coffeeMachine[4] <= 0) {
+        println("Sorry, not enough cost!")
+    } else {
+        coffeeMachine[0] =
+            if (coffeeMachine[0] >= coffee["water"]!!) coffeeMachine[0] - coffee["water"]!! else coffeeMachine[0]
+
+        coffeeMachine[1] =
+            if (coffee["milk"] != null && coffeeMachine[1] >= coffee["milk"]!!) coffeeMachine[1] - coffee["milk"]!! else coffeeMachine[1]
+
+        coffeeMachine[2] =
+            if (coffeeMachine[2] >= coffee["gramsCoffee"]!!) coffeeMachine[2] - coffee["gramsCoffee"]!! else coffeeMachine[2]
+
+        coffeeMachine[3] = if (coffeeMachine[3] > 0) coffeeMachine[3] - 1 else coffeeMachine[3]
+
+        coffeeMachine[4] = if (coffeeMachine[4] > 0) coffeeMachine[4] + coffee["cost"]!! else coffeeMachine[4]
+
+        println("I have enough resources, making you a coffee!")
+    }
 
     return coffeeMachine
 
